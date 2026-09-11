@@ -1,16 +1,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_activation_function(acfunc, dacfunc, x, name):
+def plot_activation_function(acfunc, dacfunc, x, name, discontinuity = None, kink = None):
     fig,(ax1,ax2) = plt.subplots(2, 1, figsize=(8,6))
     fig.subplots_adjust(hspace = 0.3)
 
     # Activation function
     ax1.plot(x, acfunc, color='b', linestyle='-', label=f'{name} function')
-    ax2.set_xlabel('x')
+    ax1.set_xlabel('x')
     ax1.set_ylabel('f(x)')
     ax1.grid(True)
     ax1.legend()
+
     
     # Derivative
     ax2.plot(x, dacfunc, color='r', linestyle='-', label=f'{name} derivative')
@@ -18,6 +19,14 @@ def plot_activation_function(acfunc, dacfunc, x, name):
     ax2.set_ylabel("f'(x)")
     ax2.grid(True)
     ax2.legend()
+
+    if discontinuity:
+        for x_val, y_eval, y_ival in discontinuity:
+            
+            ax1.plot(x_val, y_eval, 'wo', markeredgecolor = 'b')
+            ax1.plot(x_val, y_ival, 'bo', markeredgecolor = 'k')
+
+            ax2.plot(x_val, y_eval, 'wo', markeredgecolor = 'r')
     
     plt.show()
     
@@ -27,11 +36,9 @@ if __name__ == '__main__':
     # Heavy-side step function
     f1 = [ 1 if i>=0 else 0 for i in x ]
 
-    index = np.argmin(np.abs(x))
-    df1 = [0 for i in x]
-    df1[index] = 1
+    df1 = np.zeros_like(x)
     
-    plot_activation_function(f1, df1, x, "heavyside-step")
+    plot_activation_function(f1, df1, x, "heavyside-step", [(0,0,1)])
 
     # Piecewise-linear function
 
