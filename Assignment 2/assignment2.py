@@ -4,6 +4,26 @@ import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 from perceptron import Perceptron
 
+def calculate_margin(X, weights, bias):
+    weight_arr = np.array(weights)
+    normalized_weights = np.linalg.norm(weight_arr)
+
+    # for learning_rate == 0.0
+    if normalized_weights == 0:
+        return 0.0
+
+    distances = []
+    for x in X:
+        x_arr = np.array(x)
+
+        distance = (np.dot(weight_arr,x_arr) + bias)/normalized_weights
+        distances.append(abs(distance))
+
+    return min(distances)
+
+    
+    
+
 
 def main():
     X = [[0,0],[0,1],[1,0],[1,1]]
@@ -15,7 +35,7 @@ def main():
     }
     
    # learning_rates = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    learning_rates = [0.9]
+    learning_rates = [0.9,1.0]
 
 
     for gate_name in ["AND", "OR"]:
@@ -28,10 +48,17 @@ def main():
             percept = Perceptron(learning_rate = learning_rate, max_epoch = 200)
             perceptron_results = percept.fit(X, Y)
 
+            margin_value = calculate_margin(X,
+                                            perceptron_results['weights'],
+                                            perceptron_results['bias'])
+            perceptron_results['margin'] = margin_value
+            
             LR_results[learning_rate] = perceptron_results
-        
+
         print("=" * 80)
-        header = f"|{'LR':<2} | {'Converged':<2} | {'Epochs':<1} | {'Updates':<1} | {'Weights':<14} | {'Bias':<6} |"
+        print(gate_name+' Gate summery')
+        print("=" * 80)
+        header = f"|{'LR':<2} | {'Converged':<2} | {'Epochs':<1} | {'Updates':<1} | {'Weights':<14} | {'Bias':<6} | {'Margin':<2}|"
         print(header)
         print("=" * 80)
 
@@ -41,8 +68,9 @@ def main():
             updates = res['updates']
             w_str = f"[{res['weights'][0]:.2f}, {res['weights'][1]:.2f}]"
             bias = res['bias']
+            margin_value = res['margin']
             
-            row = f"| {lr:<2.1f} | {converged:<7} | {epochs:<6} | {updates:<7} | {w_str:<14} | {bias:<6.2f} |"
+            row = f"| {lr:<2.1f} | {converged:<7} | {epochs:<6} | {updates:<7} | {w_str:<14} | {bias:<6.2f} | {margin_value:<6.2f}|"
             print(row)
         break;
             
