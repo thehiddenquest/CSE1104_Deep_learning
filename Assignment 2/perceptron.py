@@ -1,9 +1,11 @@
 import copy
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
 class Perceptron():
-    def __init__(self, learning_rate=1, initial_weights=[1.0, -1.0], initial_bias=0.5, max_epoch=10):
+    def __init__(self, gate_name = "Unknown", learning_rate = 1, initial_weights = [1.0, -1.0], initial_bias = 0.5, max_epoch = 10):
+        self.gate_name = gate_name
         self.learning_rate = learning_rate
         self.weights = list(initial_weights)
         self.bias = initial_bias
@@ -46,8 +48,8 @@ class Perceptron():
                 x1_val = -b / w1
                 ax.axvline(x1_val, color='r', label='Decision Boundary')
 
-            ax.quiver(0, 0, w1, w2, angles='xy', scale_units='xy', scale=1, color='green', label='W vector')
-
+            ax.quiver(0, 0, w1, w2, angles='xy', scale_units='xy', scale=1, color='green')
+            ax.plot([], [], color='green', marker='>', markersize=8, label='W vector')
             ax.set_xlim(-2, 2)
             ax.set_ylim(-2, 2)
             ax.axhline(0, color='k', linestyle='--', alpha=0.5)
@@ -65,16 +67,25 @@ class Perceptron():
 
         for j in range(n, len(axes)):
             fig.delaxes(axes[j])
+        
+        handles, labels = axes[0].get_legend_handles_labels()
 
-        plt.tight_layout()
-        plt.subplots_adjust(hspace=0.5)
+        
+        fig.legend(handles, labels, loc='upper center', ncol=4, fontsize=12, bbox_to_anchor=(0.5, 1.0))
+
+        plt.subplots_adjust(hspace=0.9)
+
+        folder_name = f"Outputs/{self.gate_name}"
+        os.makedirs(folder_name, exist_ok = True)
+        file_path = os.path.join(folder_name, f"lr_{self.learning_rate}.png")
+        plt.savefig(file_path)
         plt.show()
         
     def fit(self, input_arr=None, output_arr=None):
         if not (input_arr or output_arr):
             print("Please enter valid input")
             return None
-
+        
         X = input_arr
         Y = output_arr
         
@@ -149,7 +160,7 @@ class Perceptron():
             'update_history': update_vector
         }
 if __name__ == '__main__':
-    p = Perceptron()
+    p = Perceptron("TEST AND")
     X = [[0,0],[0,1],[1,0],[1,1]]
     and_output = [0,0,0,1]
     results = p.fit(X,and_output)
