@@ -70,7 +70,36 @@ def plot_overlay_hyperplanes(X, Y, gate_name, LR_results):
     ax.legend(loc='upper right')
 
     folder_name = f"Outputs/{gate_name}"
-    file_path = os.path.join(folder_name, f"hyper_plane_overlay.png")
+    file_path = os.path.join(folder_name, f"Hyper_plane_overlay.png")
+    plt.savefig(file_path)
+    
+    plt.show()
+
+def plot_convergence_curve(gate_name, LR_results):
+    L_rates = sorted(list(LR_results.keys()))
+    epochs = [LR_results[L_rate]['epochs']
+                  if LR_results[L_rate]['converged'] else np.nan
+                  for L_rate in L_rates]
+    updates = [LR_results[L_rate]['updates'] for L_rate in L_rates]
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (12, 5))
+    ax1.plot(L_rates, epochs, marker = 'o', linestyle = '-', color = 'b',
+             linewidth = 2)
+    ax1.set_xlabel(r"Learning_rate ($\alpha$)")
+    ax1.set_ylabel("Epoch of Convergence")
+    ax1.set_title(f"{gate_name} Gate: Epoch of Convergence vs Learning Rate")
+
+    ax1.grid(True, alpha = 0.3)
+
+    ax2.plot(L_rates, updates, marker='s', color='r', linestyle='-', linewidth=2)
+    ax2.set_title(f'{gate_name} Gate: Total Updates vs Learning Rate')
+    ax2.set_xlabel(r'Learning Rate ($\alpha$)')
+    ax2.set_ylabel('Total Updates')
+    ax2.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    folder_name = f"Outputs/{gate_name}"
+    file_path = os.path.join(folder_name, f"Convergence_plot.png")
     plt.savefig(file_path)
     
     plt.show()
@@ -88,7 +117,7 @@ def main():
     }
     
    # learning_rates = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    learning_rates = [0.9,1.0]
+    learning_rates = [0.4, 0.9, 1.0]
 
 
     for gate_name in ["AND", "OR"]:
@@ -129,6 +158,7 @@ def main():
             print(row)
 
         plot_overlay_hyperplanes(X, Y, gate_name, LR_results)
+        plot_convergence_curve(gate_name, LR_results)
         break;
             
 
